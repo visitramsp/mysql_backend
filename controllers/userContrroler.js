@@ -201,9 +201,60 @@ const logoutCustomer = async (req, res) => {
   }
 };
 
+const updateCustomer = async (req, res) => {
+  try {
+    const { name, mobile_number, age, address } = req.body;
+    const userId = req.user.id;
+    const profile_picture = req.file ? req.file.path : null;
+
+    const connection = await connectToDatabase();
+
+    // Avoid updating email
+    const [currentUserRows] = await connection.query(
+      `SELECT * FROM customers WHERE id = ?`,
+      [userId]
+    );
+    if (currentUserRows.length === 0) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    // Optional: check for duplicate mobile number
+    const [existing] = await connection.query(
+      `SELECT * FROM customers WHERE mobile_number = ? AND id != ?`,
+      [mobile_number, userId]
+    );
+    if (existing.length > 0) {
+      return res
+        .status(409)
+        .json({ status: false, message: "Mobile number in use" });
+    }
+
+    await connection.query(
+      `UPDATE customers 
+       SET name = ?, mobile_number = ?, age = ?, profile_picture = ?, address = ?
+       WHERE id = ?`,
+      [name, mobile_number, age, profile_picture, address, userId]
+    );
+
+    return res.status(200).json({
+      response_code: 200,
+      status: true,
+      message: "Customer updated successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   getUserDetail,
   createCustomer,
   loginCustomer,
   logoutCustomer,
+
+  updateCustomer,
 };

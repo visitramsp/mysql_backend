@@ -27,6 +27,8 @@ const userRegister = Joi.object({
     .label("Mobile Number"),
   age: Joi.number().required("Age is Required"),
   role: Joi.string().optional(),
+  profile_picture: Joi.string().optional(),
+  address: Joi.string().optional(),
 });
 
 module.exports = { userRegister };

@@ -7,6 +7,9 @@ const Customer = sequelize.define("customers", {
   mobile_number: DataTypes.STRING,
   age: DataTypes.FLOAT,
   password: DataTypes.INTEGER,
+  profile_picture: DataTypes.INTEGER,
+  address: DataTypes.INTEGER,
+  password: DataTypes.INTEGER,
   role: DataTypes.INTEGER,
 });
 
